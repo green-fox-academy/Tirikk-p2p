@@ -26,8 +26,11 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-data-jpa')
 	compile('org.springframework.boot:spring-boot-starter-thymeleaf')
 	compile('org.springframework.boot:spring-boot-starter-web')
-	runtime('org.springframework.boot:spring-boot-devtools')
 	runtime('com.h2database:h2')
-	runtime('org.postgresql:postgresql')
+	runtime('org.springframework.boot:spring-boot-devtools')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
+	compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.13'
+	runtime('mysql:mysql-connector-java')
+
+//	runtime('org.postgresql:postgresql')
 }

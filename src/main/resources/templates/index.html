@@ -19,5 +19,15 @@
         <p>Hi there! Submit your message using the send button!</p>
     </li>
 </ul>
+<ul th:each="message : ${messages}">
+    <li>
+        <p th:text="${message.username}"/>
+        <p th:text="${message.text}"/>
+    </li>
+</ul>
+<form method="post" action="/addMessage">
+    <textarea name="message"/>
+    <input type="submit" value="Send"/>
+</form>
 </body>
 </html>

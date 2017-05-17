@@ -1,6 +1,5 @@
 package com.greenfox.chat.model;
 
-
 import javax.persistence.*;
 
 @Entity

@@ -4,6 +4,8 @@ import com.greenfox.chat.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -14,16 +16,16 @@ public class Message {
   String text;
   String timestamp;
   @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
   int id;
 
-  @Autowired
-  private MessageRepository messageRepo;
+  public Message() {
+  }
 
-  public Message(String username, String text, int id) {
+  public Message(String username, String text) {
     this.username = username;
     this.text = text;
     timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss.SSS"));
-    this.id = id;
   }
 
   public String getUsername() {
@@ -56,14 +58,5 @@ public class Message {
 
   public void setId(int id) {
     this.id = id;
-  }
-
-  public void generateId() {
-    int generatedId = (int)(Math.random() * 8999999) + 1000000;
-    if (messageRepo.exists(generatedId)) {
-      generateId();
-    } else {
-      id = generatedId;
-    }
   }
 }

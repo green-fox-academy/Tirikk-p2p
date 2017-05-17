@@ -14,6 +14,6 @@ public class MainRestController {
   @RequestMapping("/list")
   @ResponseBody
   public Object list() {
-    return userRepo.findOne("Pista");
+    return userRepo.findAll();
   }
 }

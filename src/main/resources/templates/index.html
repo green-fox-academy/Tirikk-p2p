@@ -6,11 +6,18 @@
     <meta charset="utf-8" />
 </head>
 <body>
+<p th:if="${userNotProvided} == true">The username field is empty</p>
 <h1>Peer to Peer Chat Program</h1>
-<form method="post" action="/registerNew">
-    <span>Your username</span>
-    <input type="text" name="new_user"/>
+<form method="post" action="/update">
+    <span>Your username:</span>
+    <input type="text" name="user"/>
     <input type="submit" value="update"/>
 </form>
+<ul>
+    <li>
+        <p>App</p>
+        <p>Hi there! Submit your message using the send button!</p>
+    </li>
+</ul>
 </body>
 </html>

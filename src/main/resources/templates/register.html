@@ -9,11 +9,11 @@
 </header>
 <body>
 <p th:if="${userNotProvided} == true">The username field is empty</p>
-<h1>Register</h1>
-<form method="post" action="/registerNew">
-    <span>Username</span>
+<h1>Enter</h1>
+<form method="post" action="/enter">
+    <span>Choose your name:</span>
     <input type="text" name="new_user"/>
-    <input type="submit" value="register"/>
+    <input type="submit" value="enter"/>
 </form>
 </body>
 </html>

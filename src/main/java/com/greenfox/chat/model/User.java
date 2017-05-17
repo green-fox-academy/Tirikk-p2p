@@ -1,9 +1,12 @@
 package com.greenfox.chat.model;
 
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
+@Table(name = "chat_user")
 public class User {
   @Id
   String name;

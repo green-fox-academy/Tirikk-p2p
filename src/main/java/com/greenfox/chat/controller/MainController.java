@@ -30,7 +30,7 @@ public class MainController {
     if (userRepo.count() == 0) {
       return "redirect:/enter";
     } else {
-      Iterable<Message> messages = messageRepo.findAll();
+      Iterable<Message> messages = messageRepo.findAllByOrderByTimestampAsc();
       model.addAttribute("messages", messages);
       model.addAttribute("userNotProvided", false);
       return "index";

@@ -1,33 +1,35 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>P2P Chat</title>
-    <link rel="stylesheet" th:href="@{/style.css}" />
-    <meta charset="utf-8" />
+  <title>P2P Chat</title>
+  <link rel="stylesheet" th:href="@{/style.css}"/>
+  <meta charset="utf-8"/>
 </head>
 <body>
 <p th:if="${userNotProvided} == true">The username field is empty</p>
 <h1>Peer to Peer Chat Program</h1>
 <form method="post" action="/update">
-    <span>Your username:</span>
-    <input type="text" name="user"/>
-    <input type="submit" value="update"/>
+  <span>Your username:</span>
+  <input type="text" name="user"/>
+  <input type="submit" value="update"/>
 </form>
-<ul>
+<div th:unless="${userNotProvided} == true">
+  <ul>
     <li>
-        <p>App</p>
-        <p>Hi there! Submit your message using the send button!</p>
+      <p>App</p>
+      <p>Hi there! Submit your message using the send button!</p>
     </li>
-</ul>
-<ul th:each="message : ${messages}">
+  </ul>
+  <ul th:each="message : ${messages}">
     <li>
-        <p th:text="${message.username}"/>
-        <p th:text="${message.text}"/>
+      <p th:text="${message.username}"/>
+      <p th:text="${message.text}"/>
     </li>
-</ul>
-<form method="post" action="/addMessage">
+  </ul>
+  <form method="post" action="/addMessage">
     <textarea name="message"/>
     <input type="submit" value="Send"/>
-</form>
+  </form>
+</div>
 </body>
 </html>

@@ -1,6 +1,7 @@
 package com.greenfox.chat.controller;
 
 //import com.greenfox.chat.model.Log;
+import com.greenfox.chat.model.Log;
 import com.greenfox.chat.model.Message;
 import com.greenfox.chat.model.User;
 import com.greenfox.chat.repository.MessageRepository;
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 @Controller
 public class MainController {
@@ -24,8 +24,9 @@ public class MainController {
 
   @RequestMapping("/")
   public String greeting(Model model, HttpServletRequest request) {
-//    System.err.println(new Log(request.getRequestURI(), request.getMethod(), System.getenv("CHAT_APP_LOGLEVEL"),
-//            request.getQueryString()));
+    if (System.getenv("CHAT_APP_LOGLEVEL").equals("INFO")) {
+      System.out.println(new Log(request.getRequestURI(), request.getMethod(), System.getenv("CHAT_APP_LOGLEVEL")));
+    }
     if (userRepo.count() == 0) {
       return "redirect:/enter";
     } else {
@@ -37,13 +38,24 @@ public class MainController {
   }
 
   @RequestMapping("/enter")
-  public String enter(Model model) {
-    model.addAttribute("userNotProvided", false);
-    return "register";
+  public String enter(Model model, HttpServletRequest request) {
+    if (System.getenv("CHAT_APP_LOGLEVEL").equals("INFO")) {
+      System.out.println(new Log(request.getRequestURI(), request.getMethod(), System.getenv("CHAT_APP_LOGLEVEL")));
+    }
+    if (userRepo.count() == 0) {
+      model.addAttribute("userNotProvided", false);
+      return "register";
+    } else {
+      return "redirect:/";
+    }
   }
 
   @RequestMapping(value = "/enterNew")
-  public String enterNew(Model model, @RequestParam(name = "new_user", required = false) String user) {
+  public String enterNew(Model model, @RequestParam(name = "new_user", required = false) String user, HttpServletRequest request) {
+    if (System.getenv("CHAT_APP_LOGLEVEL").equals("INFO")) {
+      System.out.println(new Log(request.getRequestURI(), request.getMethod(), System.getenv("CHAT_APP_LOGLEVEL"),
+              request.getParameter("new_user")));
+    }
     if (user.equals("")) {
       model.addAttribute("userNotProvided", true);
       return "register";
@@ -54,7 +66,11 @@ public class MainController {
   }
 
   @RequestMapping(value = "/update")
-  public String update(Model model, @RequestParam(name = "user", required = false) String name) {
+  public String update(Model model, @RequestParam(name = "user", required = false) String name, HttpServletRequest request) {
+    if (System.getenv("CHAT_APP_LOGLEVEL").equals("INFO")) {
+      System.out.println(new Log(request.getRequestURI(), request.getMethod(), System.getenv("CHAT_APP_LOGLEVEL"),
+              request.getParameter("user")));
+    }
     if (name.equals("")) {
       model.addAttribute("userNotProvided", true);
       return "index";
@@ -67,8 +83,20 @@ public class MainController {
   }
 
   @RequestMapping("/addMessage")
-  public String addMessage(@RequestParam(name = "message") String message) {
-    messageRepo.save(new Message(userRepo.findOne(1).getName(), message));
+  public String addMessage(@RequestParam(name = "message") String message, HttpServletRequest request) {
+    if (System.getenv("CHAT_APP_LOGLEVEL").equals("INFO")) {
+      System.out.println(new Log(request.getRequestURI(), request.getMethod(), System.getenv("CHAT_APP_LOGLEVEL"),
+              request.getParameter("message")));
+    }
+    int id = 0;
+    boolean idExists = true;
+    while (idExists) {
+      id = (int)(Math.random() * 8999999) + 1000000;
+      if (!messageRepo.exists(id)) {
+        idExists = false;
+      }
+    }
+    messageRepo.save(new Message(userRepo.findOne(1).getName(), message, id));
     return "redirect:/";
   }
 }

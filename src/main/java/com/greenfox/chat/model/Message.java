@@ -1,31 +1,26 @@
 package com.greenfox.chat.model;
 
-import com.greenfox.chat.repository.MessageRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.sql.Timestamp;
 
 @Entity
 public class Message {
   String username;
   String text;
-  String timestamp;
+  Timestamp timestamp;
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
   int id;
 
   public Message() {
   }
 
-  public Message(String username, String text) {
+  public Message(String username, String text, int id) {
     this.username = username;
     this.text = text;
-    timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss.SSS"));
+    timestamp = new Timestamp(System.currentTimeMillis());
+    this.id = id;
   }
 
   public String getUsername() {
@@ -36,7 +31,7 @@ public class Message {
     return text;
   }
 
-  public String getTimestamp() {
+  public Timestamp getTimestamp() {
     return timestamp;
   }
 
@@ -52,7 +47,7 @@ public class Message {
     this.text = text;
   }
 
-  public void setTimestamp(String timestamp) {
+  public void setTimestamp(Timestamp timestamp) {
     this.timestamp = timestamp;
   }
 

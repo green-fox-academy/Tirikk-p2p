@@ -1,17 +1,20 @@
 package com.greenfox.chat.controller;
 
 //import com.greenfox.chat.model.Log;
-import com.greenfox.chat.model.Log;
-import com.greenfox.chat.model.Message;
-import com.greenfox.chat.model.User;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.greenfox.chat.model.*;
 import com.greenfox.chat.repository.MessageRepository;
 import com.greenfox.chat.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -84,7 +87,7 @@ public class MainController {
   }
 
   @RequestMapping("/addMessage")
-  public String addMessage(@RequestParam(name = "message") String message, HttpServletRequest request) {
+  public String addMessage(@RequestParam(name = "message") String message, HttpServletRequest request) throws JsonProcessingException {
     if (System.getenv("CHAT_APP_LOGLEVEL").equals("INFO")) {
       System.out.println(new Log(request.getRequestURI(), request.getMethod(), System.getenv("CHAT_APP_LOGLEVEL"),
               request.getParameter("message")));
@@ -97,7 +100,24 @@ public class MainController {
         idExists = false;
       }
     }
-    messageRepo.save(new Message(userRepo.findOne(1).getName(), message, id));
+    Message messageToSave = new Message(userRepo.findOne(1).getName(), message, id);
+    messageRepo.save(messageToSave);
+
+    Client client = new Client().setId("Tirikk");
+    ReceivedMessage receivedMessage = new ReceivedMessage()
+            .setClient(client)
+            .setMessage(messageToSave);
+
+    ObjectMapper mapper = new ObjectMapper();
+    String jsonOutput = mapper.writeValueAsString(receivedMessage);
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+
+    HttpEntity<String> entity = new HttpEntity<>(jsonOutput, headers);
+    RestTemplate rt = new RestTemplate();
+    rt.put("https://pure-dusk-70197.herokuapp.com/api/message/receive", entity);
+
     return "redirect:/";
   }
 }

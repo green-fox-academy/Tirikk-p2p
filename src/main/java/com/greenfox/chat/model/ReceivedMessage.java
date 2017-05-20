@@ -1,7 +1,12 @@
 package com.greenfox.chat.model;
 
+import javax.validation.Valid;
+
 public class ReceivedMessage {
+  @Valid
   Message message;
+
+  @Valid
   Client client;
 
   public Message getMessage() {
@@ -12,11 +17,13 @@ public class ReceivedMessage {
     return client;
   }
 
-  public void setMessage(Message message) {
+  public ReceivedMessage setMessage(Message message) {
     this.message = message;
+    return this;
   }
 
-  public void setClient(Client client) {
+  public ReceivedMessage setClient(Client client) {
     this.client = client;
+    return this;
   }
 }

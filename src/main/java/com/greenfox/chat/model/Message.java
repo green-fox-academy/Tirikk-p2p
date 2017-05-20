@@ -1,15 +1,19 @@
 package com.greenfox.chat.model;
 
-
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 
 @Entity
 public class Message {
+  @NotNull
   String username;
+  @NotNull
   String text;
+  @NotNull
   Timestamp timestamp;
+  @NotNull
   @Id
   int id;
 
@@ -39,19 +43,23 @@ public class Message {
     return id;
   }
 
-  public void setUsername(String username) {
+  public Message setUsername(String username) {
     this.username = username;
+    return this;
   }
 
-  public void setText(String text) {
+  public Message setText(String text) {
     this.text = text;
+    return this;
   }
 
-  public void setTimestamp(Timestamp timestamp) {
+  public Message setTimestamp(Timestamp timestamp) {
     this.timestamp = timestamp;
+    return this;
   }
 
-  public void setId(int id) {
+  public Message setId(int id) {
     this.id = id;
+    return this;
   }
 }

@@ -19,8 +19,11 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.nio.charset.Charset;
 import java.sql.Timestamp;
+import java.util.List;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -66,5 +69,48 @@ public class MainRestControllerTest {
             .andExpect(status().isOk())
             .andExpect(content().contentType(contentType))
             .andExpect(jsonPath("$.status", is("ok")));
+  }
+
+  @Test
+  public void testReceive_withoutMessageText() throws Exception {
+    Message message = new Message()
+            .setId(7655482)
+            .setUsername("EggDice")
+            .setTimestamp(new Timestamp(1322018752992L));
+    Client client = new Client().setId("EggDice");
+    ReceivedMessage receivedMessage = new ReceivedMessage()
+            .setMessage(message)
+            .setClient(client);
+    ObjectMapper mapper = new ObjectMapper();
+    String jsonInput = mapper.writeValueAsString(receivedMessage);
+
+    mockMvc.perform(post("/api/message/receive")
+            .contentType(contentType)
+            .content(jsonInput))
+            .andExpect(status().isUnauthorized())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$.status", is("error")))
+            .andExpect(jsonPath("$.message", containsString("message.text")));
+  }
+
+  @Test
+  public void testReceive_withoutClient() throws Exception {
+    Message message = new Message()
+            .setId(7655482)
+            .setUsername("EggDice")
+            .setText("How you doin'?")
+            .setTimestamp(new Timestamp(1322018752992L));
+    ReceivedMessage receivedMessage = new ReceivedMessage()
+            .setMessage(message);
+    ObjectMapper mapper = new ObjectMapper();
+    String jsonInput = mapper.writeValueAsString(receivedMessage);
+
+    mockMvc.perform(post("/api/message/receive")
+            .contentType(contentType)
+            .content(jsonInput))
+            .andExpect(status().isUnauthorized())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$.status", is("error")))
+            .andExpect(jsonPath("$.message", containsString("client")));
   }
 }

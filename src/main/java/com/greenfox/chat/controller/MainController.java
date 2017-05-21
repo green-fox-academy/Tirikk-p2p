@@ -112,7 +112,7 @@ public class MainController {
     String jsonOutput = mapper.writeValueAsString(receivedMessage);
 
     HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON);
+    headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
 
     HttpEntity<String> entity = new HttpEntity<>(jsonOutput);
     RestTemplate rt = new RestTemplate();

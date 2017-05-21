@@ -116,7 +116,7 @@ public class MainController {
 
     HttpEntity<String> entity = new HttpEntity<>(jsonOutput, headers);
     RestTemplate rt = new RestTemplate();
-    rt.put(System.getenv("CHAT_APP_PEER_ADDRESS" + "/api/message/receive"), entity);
+    rt.put(System.getenv("CHAT_APP_PEER_ADDRESS")  + "/api/message/receive", entity);
 
     return "redirect:/";
   }

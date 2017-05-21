@@ -114,9 +114,9 @@ public class MainController {
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
 
-    HttpEntity<String> entity = new HttpEntity<>(jsonOutput);
+    HttpEntity<String> entity = new HttpEntity<>(jsonOutput, headers);
     RestTemplate rt = new RestTemplate();
-    rt.postForObject(System.getenv("CHAT_APP_PEER_ADDRESS")  + "/api/message/receive", entity, OkResponse.class);
+    rt.postForLocation(System.getenv("CHAT_APP_PEER_ADDRESS")  + "/api/message/receive", entity);
 
     return "redirect:/";
   }

@@ -1,15 +1,21 @@
 package com.greenfox.chat.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.greenfox.chat.model.ErrorResponse;
 import com.greenfox.chat.model.OkResponse;
 import com.greenfox.chat.model.ReceivedMessage;
 import com.greenfox.chat.repository.MessageRepository;
 import com.greenfox.chat.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
 
@@ -35,7 +41,7 @@ public class MainRestController {
 
   @RequestMapping("/api/message/receive")
   @CrossOrigin("*")
-  public OkResponse receive(@RequestBody() @Valid ReceivedMessage receivedMessage, BindingResult bindingResult) {
+  public OkResponse receive(@RequestBody() @Valid ReceivedMessage receivedMessage, BindingResult bindingResult) throws JsonProcessingException {
     if (bindingResult.hasErrors()) {
       StringBuilder missingFields = new StringBuilder();
       for (FieldError error : bindingResult.getFieldErrors()) {
@@ -43,14 +49,26 @@ public class MainRestController {
       }
       throw new IllegalArgumentException(missingFields.toString());
     } else {
-      messageRepo.save(receivedMessage.getMessage());
+      if (!receivedMessage.getClient().getId().equals(System.getenv("CHAT_APP_UNIQUE_ID"))) {
+        messageRepo.save(receivedMessage.getMessage());
+
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonOutput = mapper.writeValueAsString(receivedMessage);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+
+        HttpEntity<String> entity = new HttpEntity<>(jsonOutput, headers);
+        RestTemplate rt = new RestTemplate();
+        rt.put(System.getenv("CHAT_APP_PEER_ADDRESS"), entity);
+      }
       return new OkResponse();
     }
   }
 
   @ResponseStatus(code = HttpStatus.UNAUTHORIZED)
   @ExceptionHandler(IllegalArgumentException.class)
-  public ErrorResponse handleAllException(IllegalArgumentException e) {
+  public ErrorResponse handleIllegalArgsException(IllegalArgumentException e) {
     return new ErrorResponse(String.format("Missing field(s): %s", e.getMessage()));
   }
 }

@@ -103,7 +103,7 @@ public class MainController {
     Message messageToSave = new Message(userRepo.findOne(1).getName(), message, id);
     messageRepo.save(messageToSave);
 
-    Client client = new Client().setId("Tirikk");
+    Client client = new Client().setId(System.getenv("CHAT_APP_UNIQUE_ID"));
     ReceivedMessage receivedMessage = new ReceivedMessage()
             .setClient(client)
             .setMessage(messageToSave);
@@ -116,7 +116,7 @@ public class MainController {
 
     HttpEntity<String> entity = new HttpEntity<>(jsonOutput, headers);
     RestTemplate rt = new RestTemplate();
-    rt.put("https://pure-dusk-70197.herokuapp.com/api/message/receive", entity);
+    rt.put(System.getenv("CHAT_APP_PEER_ADDRESS"), entity);
 
     return "redirect:/";
   }

@@ -3,10 +3,10 @@
 <head>
   <title>P2P Chat</title>
   <link rel="stylesheet" th:href="@{/style.css}"/>
-  <script src="/app.js"/>
+  <!--<script src="/app.js"/>-->
   <meta charset="utf-8"/>
 </head>
-<body onload="connect()">
+<body>
 <p th:if="${userNotProvided} == true">The username field is empty</p>
 <h1>Peer to Peer Chat Program</h1>
 <form method="post" action="/update">
@@ -31,7 +31,7 @@
     <textarea name="message"/>
     <input type="submit" value="Send"/>
   </form>
-  <a href="" onclick="Refresh">Refresh</a>
+  <a href="/">Refresh</a>
 </div>
 </body>
 </html>

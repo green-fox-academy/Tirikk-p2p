@@ -12,7 +12,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.messaging.handler.annotation.SendTo;
+//import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -41,7 +41,7 @@ public class MainRestController {
   }
 
   @RequestMapping("/api/message/receive")
-  @SendTo("/index/messages")
+//  @SendTo("/index/messages")
   @CrossOrigin("*")
   public OkResponse receive(@RequestBody() @Valid ReceivedMessage receivedMessage, BindingResult bindingResult) throws JsonProcessingException {
     if (bindingResult.hasErrors()) {
@@ -51,19 +51,19 @@ public class MainRestController {
       }
       throw new IllegalArgumentException(missingFields.toString());
     } else {
-      if (!receivedMessage.getClient().getId().equals(System.getenv("CHAT_APP_UNIQUE_ID"))) {
+//      if (!receivedMessage.getClient().getId().equals(System.getenv("CHAT_APP_UNIQUE_ID"))) {
         messageRepo.save(receivedMessage.getMessage());
 
-        ObjectMapper mapper = new ObjectMapper();
-        String jsonOutput = mapper.writeValueAsString(receivedMessage);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-
-        HttpEntity<String> entity = new HttpEntity<>(jsonOutput, headers);
-        RestTemplate rt = new RestTemplate();
-        rt.postForObject(System.getenv("CHAT_APP_PEER_ADDRESS")  + "/api/message/receive", entity, OkResponse.class);
-      }
+//        ObjectMapper mapper = new ObjectMapper();
+//        String jsonOutput = mapper.writeValueAsString(receivedMessage);
+//
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+//
+//        HttpEntity<String> entity = new HttpEntity<>(jsonOutput, headers);
+//        RestTemplate rt = new RestTemplate();
+//        rt.postForObject(System.getenv("CHAT_APP_PEER_ADDRESS")  + "/api/message/receive", entity, OkResponse.class);
+//      }
       return new OkResponse();
     }
   }

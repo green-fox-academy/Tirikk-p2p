@@ -49,28 +49,28 @@ public class MainRestController {
       for (FieldError error : bindingResult.getFieldErrors()) {
         missingFields.append(error.getField()).append(", ");
       }
-      throw new IllegalArgumentException(missingFields.toString());
+      throw new NullPointerException(missingFields.toString());
     } else {
-//      if (!receivedMessage.getClient().getId().equals(System.getenv("CHAT_APP_UNIQUE_ID"))) {
+      if (!receivedMessage.getClient().getId().equals(System.getenv("CHAT_APP_UNIQUE_ID"))) {
         messageRepo.save(receivedMessage.getMessage());
 
-//        ObjectMapper mapper = new ObjectMapper();
-//        String jsonOutput = mapper.writeValueAsString(receivedMessage);
-//
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-//
-//        HttpEntity<String> entity = new HttpEntity<>(jsonOutput, headers);
-//        RestTemplate rt = new RestTemplate();
-//        rt.postForObject(System.getenv("CHAT_APP_PEER_ADDRESS")  + "/api/message/receive", entity, OkResponse.class);
-//      }
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonOutput = mapper.writeValueAsString(receivedMessage);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+
+        HttpEntity<String> entity = new HttpEntity<>(jsonOutput, headers);
+        RestTemplate rt = new RestTemplate();
+        rt.postForObject(System.getenv("CHAT_APP_PEER_ADDRESS")  + "/api/message/receive", entity, OkResponse.class);
+      }
       return new OkResponse();
     }
   }
 
   @ResponseStatus(code = HttpStatus.UNAUTHORIZED)
-  @ExceptionHandler(IllegalArgumentException.class)
-  public ErrorResponse handleIllegalArgsException(IllegalArgumentException e) {
+  @ExceptionHandler(NullPointerException.class)
+  public ErrorResponse handleIllegalArgsException(NullPointerException e) {
     return new ErrorResponse(String.format("Missing field(s): %s", e.getMessage()));
   }
 }

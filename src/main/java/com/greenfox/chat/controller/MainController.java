@@ -111,10 +111,10 @@ public class MainController {
     ObjectMapper mapper = new ObjectMapper();
     String jsonOutput = mapper.writeValueAsString(receivedMessage);
 
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+//    HttpHeaders headers = new HttpHeaders();
+//    headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
 
-    HttpEntity<String> entity = new HttpEntity<>(jsonOutput, headers);
+    HttpEntity<String> entity = new HttpEntity<>(jsonOutput);
     RestTemplate rt = new RestTemplate();
     rt.postForObject(System.getenv("CHAT_APP_PEER_ADDRESS")  + "/api/message/receive", entity, OkResponse.class);
 

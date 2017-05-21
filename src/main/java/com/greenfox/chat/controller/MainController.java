@@ -16,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
@@ -121,8 +122,11 @@ public class MainController {
     ClientHttpRequestFactory requestFactory = new
             HttpComponentsClientHttpRequestFactory(HttpClients.createDefault());
     RestTemplate rt = new RestTemplate(requestFactory);
-    rt.postForLocation(System.getenv("CHAT_APP_PEER_ADDRESS")  + "/api/message/receive", entity);
-
+    try {
+      rt.postForLocation(System.getenv("CHAT_APP_PEER_ADDRESS") + "/api/message/receive", entity);
+    } catch (HttpServerErrorException e) {
+      e.printStackTrace();
+    }
     return "redirect:/";
   }
 }

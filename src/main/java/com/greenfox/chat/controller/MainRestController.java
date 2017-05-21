@@ -19,6 +19,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import sun.net.www.http.HttpClient;
 
@@ -69,7 +70,11 @@ public class MainRestController {
         ClientHttpRequestFactory requestFactory = new
                 HttpComponentsClientHttpRequestFactory(HttpClients.createDefault());
         RestTemplate rt = new RestTemplate(requestFactory);
-        rt.postForLocation(System.getenv("CHAT_APP_PEER_ADDRESS")  + "/api/message/receive", entity);
+        try {
+          rt.postForLocation(System.getenv("CHAT_APP_PEER_ADDRESS") + "/api/message/receive", entity);
+        } catch (HttpServerErrorException e) {
+          e.printStackTrace();
+        }
       }
       return new OkResponse();
     }

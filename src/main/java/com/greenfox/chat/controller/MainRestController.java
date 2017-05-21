@@ -7,16 +7,20 @@ import com.greenfox.chat.model.OkResponse;
 import com.greenfox.chat.model.ReceivedMessage;
 import com.greenfox.chat.repository.MessageRepository;
 import com.greenfox.chat.repository.UserRepository;
+import org.apache.http.impl.client.HttpClients;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 //import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import sun.net.www.http.HttpClient;
 
 import javax.validation.Valid;
 
@@ -61,7 +65,10 @@ public class MainRestController {
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
 
         HttpEntity<String> entity = new HttpEntity<>(jsonOutput, headers);
-        RestTemplate rt = new RestTemplate();
+
+        ClientHttpRequestFactory requestFactory = new
+                HttpComponentsClientHttpRequestFactory(HttpClients.createDefault());
+        RestTemplate rt = new RestTemplate(requestFactory);
         rt.postForLocation(System.getenv("CHAT_APP_PEER_ADDRESS")  + "/api/message/receive", entity);
       }
       return new OkResponse();

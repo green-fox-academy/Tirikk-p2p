@@ -1,54 +1,34 @@
 package com.greenfox.chat.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.greenfox.chat.model.ErrorResponse;
 import com.greenfox.chat.model.OkResponse;
 import com.greenfox.chat.model.ReceivedMessage;
 import com.greenfox.chat.repository.MessageRepository;
-import com.greenfox.chat.repository.UserRepository;
-import org.apache.http.impl.client.HttpClients;
+import com.greenfox.chat.service.MessageSender;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-//import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpServerErrorException;
-import org.springframework.web.client.RestTemplate;
-import sun.net.www.http.HttpClient;
 
 import javax.validation.Valid;
 
 @RestController
 public class MainRestController {
   @Autowired
-  UserRepository userRepo;
-
-  @Autowired
+  private
   MessageRepository messageRepo;
 
-  @RequestMapping("/list")
-  @ResponseBody
-  public Object list() {
-    return userRepo.findAll();
-  }
+  @Autowired
+  private
+  SimpMessagingTemplate template;
 
-  @RequestMapping("/listMessages")
-  @ResponseBody
-  public Object listMessages() {
-    return messageRepo.findAll();
-  }
-
-  @RequestMapping("/api/message/receive")
-//  @SendTo("/index/messages")
+  @PostMapping("/api/message/receive")
   @CrossOrigin("*")
-  public OkResponse receive(@RequestBody() @Valid ReceivedMessage receivedMessage, BindingResult bindingResult) throws JsonProcessingException {
+  public OkResponse receive(@RequestBody() @Valid ReceivedMessage receivedMessage, BindingResult bindingResult)
+          throws JsonProcessingException {
     if (bindingResult.hasErrors()) {
       StringBuilder missingFields = new StringBuilder();
       for (FieldError error : bindingResult.getFieldErrors()) {
@@ -58,23 +38,8 @@ public class MainRestController {
     } else {
       if (!receivedMessage.getClient().getId().equals(System.getenv("CHAT_APP_UNIQUE_ID"))) {
         messageRepo.save(receivedMessage.getMessage());
-
-        ObjectMapper mapper = new ObjectMapper();
-        String jsonOutput = mapper.writeValueAsString(receivedMessage);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-
-        HttpEntity<String> entity = new HttpEntity<>(jsonOutput, headers);
-
-        ClientHttpRequestFactory requestFactory = new
-                HttpComponentsClientHttpRequestFactory(HttpClients.createDefault());
-        RestTemplate rt = new RestTemplate(requestFactory);
-        try {
-          rt.postForLocation(System.getenv("CHAT_APP_PEER_ADDRESS") + "/api/message/receive", entity);
-        } catch (HttpServerErrorException e) {
-          e.printStackTrace();
-        }
+        sendMessageWS();
+        MessageSender.sendReceivedMessage(receivedMessage);
       }
       return new OkResponse();
     }
@@ -84,5 +49,9 @@ public class MainRestController {
   @ExceptionHandler(NullPointerException.class)
   public ErrorResponse handleIllegalArgsException(NullPointerException e) {
     return new ErrorResponse(String.format("Missing field(s): %s", e.getMessage()));
+  }
+
+  private void sendMessageWS() {
+    template.convertAndSend("/topic/messages", "proba");
   }
 }

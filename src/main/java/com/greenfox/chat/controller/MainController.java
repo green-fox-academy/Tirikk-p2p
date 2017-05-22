@@ -1,35 +1,31 @@
 package com.greenfox.chat.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.greenfox.chat.model.*;
 import com.greenfox.chat.repository.MessageRepository;
-import com.greenfox.chat.repository.UserRepository;
-import org.apache.http.impl.client.HttpClients;
+import com.greenfox.chat.repository.UserRepository;;
+import com.greenfox.chat.service.IdGenerator;
+import com.greenfox.chat.service.MessageSender;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.client.HttpServerErrorException;
-import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 
 @Controller
 public class MainController {
   @Autowired
+  private
   UserRepository userRepo;
 
   @Autowired
+  private
   MessageRepository messageRepo;
 
-  @RequestMapping("/")
+  @GetMapping("/")
   public String greeting(Model model, HttpServletRequest request) {
     if (System.getenv("CHAT_APP_LOGLEVEL").equals("INFO")) {
       System.out.println(new Log(request.getRequestURI(), request.getMethod(), System.getenv("CHAT_APP_LOGLEVEL")));
@@ -44,11 +40,8 @@ public class MainController {
     }
   }
 
-  @RequestMapping("/enter")
-  public String enter(Model model, HttpServletRequest request) {
-    if (System.getenv("CHAT_APP_LOGLEVEL").equals("INFO")) {
-      System.out.println(new Log(request.getRequestURI(), request.getMethod(), System.getenv("CHAT_APP_LOGLEVEL")));
-    }
+  @GetMapping("/enter")
+  public String enter(Model model) {
     if (userRepo.count() == 0) {
       model.addAttribute("userNotProvided", false);
       return "register";
@@ -57,12 +50,8 @@ public class MainController {
     }
   }
 
-  @RequestMapping(value = "/enterNew")
-  public String enterNew(Model model, @RequestParam(name = "new_user", required = false) String user, HttpServletRequest request) {
-    if (System.getenv("CHAT_APP_LOGLEVEL").equals("INFO")) {
-      System.out.println(new Log(request.getRequestURI(), request.getMethod(), System.getenv("CHAT_APP_LOGLEVEL"),
-              request.getParameter("new_user")));
-    }
+  @PostMapping(value = "/enterNew")
+  public String enterNew(Model model, @RequestParam(name = "new_user", required = false) String user) {
     if (user.equals("")) {
       model.addAttribute("userNotProvided", true);
       return "register";
@@ -72,12 +61,8 @@ public class MainController {
     }
   }
 
-  @RequestMapping(value = "/update")
-  public String update(Model model, @RequestParam(name = "user", required = false) String name, HttpServletRequest request) {
-    if (System.getenv("CHAT_APP_LOGLEVEL").equals("INFO")) {
-      System.out.println(new Log(request.getRequestURI(), request.getMethod(), System.getenv("CHAT_APP_LOGLEVEL"),
-              request.getParameter("user")));
-    }
+  @PostMapping(value = "/update")
+  public String update(Model model, @RequestParam(name = "user", required = false) String name) {
     if (name.equals("")) {
       model.addAttribute("userNotProvided", true);
       return "index";
@@ -89,44 +74,11 @@ public class MainController {
     }
   }
 
-  @RequestMapping("/addMessage")
-  public String addMessage(@RequestParam(name = "message") String message, HttpServletRequest request) throws JsonProcessingException {
-    if (System.getenv("CHAT_APP_LOGLEVEL").equals("INFO")) {
-      System.out.println(new Log(request.getRequestURI(), request.getMethod(), System.getenv("CHAT_APP_LOGLEVEL"),
-              request.getParameter("message")));
-    }
-    int id = 0;
-    boolean idExists = true;
-    while (idExists) {
-      id = (int)(Math.random() * 8999999) + 1000000;
-      if (!messageRepo.exists(id)) {
-        idExists = false;
-      }
-    }
-    Message messageToSave = new Message(userRepo.findOne(1).getName(), message, id);
+  @PostMapping("/addMessage")
+  public String addMessage(@RequestParam(name = "message") String message) throws JsonProcessingException {
+    Message messageToSave = new Message(userRepo.findOne(1).getName(), message, IdGenerator.generateId(messageRepo));
     messageRepo.save(messageToSave);
-
-    Client client = new Client().setId(System.getenv("CHAT_APP_UNIQUE_ID"));
-    ReceivedMessage receivedMessage = new ReceivedMessage()
-            .setClient(client)
-            .setMessage(messageToSave);
-
-    ObjectMapper mapper = new ObjectMapper();
-    String jsonOutput = mapper.writeValueAsString(receivedMessage);
-
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-
-    HttpEntity<String> entity = new HttpEntity<>(jsonOutput, headers);
-
-    ClientHttpRequestFactory requestFactory = new
-            HttpComponentsClientHttpRequestFactory(HttpClients.createDefault());
-    RestTemplate rt = new RestTemplate(requestFactory);
-    try {
-      rt.postForLocation(System.getenv("CHAT_APP_PEER_ADDRESS") + "/api/message/receive", entity);
-    } catch (HttpServerErrorException e) {
-      e.printStackTrace();
-    }
+    MessageSender.sendMessage(messageToSave);
     return "redirect:/";
   }
 }

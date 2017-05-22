@@ -2,13 +2,16 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <title>P2P Chat</title>
-  <link rel="stylesheet" th:href="@{/style.css}"/>
-  <!--<script src="/app.js"/>-->
+  <script src="/webjars/sockjs-client/sockjs.min.js"></script>
+  <script src="/webjars/stomp-websocket/stomp.min.js"></script>
+  <script type="text/javascript" src="app.js"></script>
   <meta charset="utf-8"/>
 </head>
-<body>
+<body onload="">
+<noscript><h2>No javascript support</h2></noscript>
 <p th:if="${userNotProvided} == true">The username field is empty</p>
 <h1>Peer to Peer Chat Program</h1>
+<!--<button onclick="connect();">Connect</button>-->
 <form method="post" action="/update">
   <span>Your username:</span>
   <input type="text" name="user"/>
@@ -18,20 +21,20 @@
   <ul>
     <li>
       <p>App<br/>
-      Hi there! Submit your message using the send button!</p>
+        Hi there! Submit your message using the send button!</p>
     </li>
   </ul>
   <ul th:each="message : ${messages}">
     <li>
-      <p th:text="${message.username}"/>
-      <p th:text="${message.text}"/>
+      <span th:text="${message.username}"/><br/>
+      <span th:text="${message.text}"/>
     </li>
   </ul>
   <form method="post" action="/addMessage">
     <textarea name="message"/>
     <input type="submit" value="Send"/>
   </form>
-  <a href="/">Refresh</a>
+  <button onclick="Refresh();">Refresh</button>
 </div>
 </body>
 </html>

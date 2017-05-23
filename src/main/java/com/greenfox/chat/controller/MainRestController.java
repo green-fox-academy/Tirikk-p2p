@@ -2,6 +2,7 @@ package com.greenfox.chat.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.greenfox.chat.model.ErrorResponse;
+import com.greenfox.chat.model.Message;
 import com.greenfox.chat.model.OkResponse;
 import com.greenfox.chat.model.ReceivedMessage;
 import com.greenfox.chat.repository.MessageRepository;
@@ -11,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -33,10 +33,11 @@ public class MainRestController {
     if (bindingResult.hasErrors()) {
       throw new NullPointerException(Validator.getMissingFields(bindingResult));
     } else {
-      if (!receivedMessage.getClient().getId().equals(System.getenv("CHAT_APP_UNIQUE_ID"))) {
+      if (!receivedMessage.getClient().getId().equals(System.getenv("CHAT_APP_UNIQUE_ID")) && !messageRepo.exists
+              (receivedMessage.getMessage().getId())) {
         messageRepo.save(receivedMessage.getMessage());
-        sendMessageWS();
-        MessageSender.sendReceivedMessage(receivedMessage);
+        sendMessageWS(receivedMessage.getMessage());
+//        MessageSender.sendReceivedMessage(receivedMessage);
       }
       return new OkResponse();
     }
@@ -48,7 +49,7 @@ public class MainRestController {
     return new ErrorResponse(String.format("Missing field(s): %s", e.getMessage()));
   }
 
-  private void sendMessageWS() {
-    template.convertAndSend("/topic/messages", "proba");
+  private void sendMessageWS(Message message) {
+    template.convertAndSend("/topic/messages", message);
   }
 }

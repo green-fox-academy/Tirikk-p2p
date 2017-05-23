@@ -6,6 +6,7 @@ import com.greenfox.chat.model.OkResponse;
 import com.greenfox.chat.model.ReceivedMessage;
 import com.greenfox.chat.repository.MessageRepository;
 import com.greenfox.chat.service.MessageSender;
+import com.greenfox.chat.service.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -30,11 +31,7 @@ public class MainRestController {
   public OkResponse receive(@RequestBody() @Valid ReceivedMessage receivedMessage, BindingResult bindingResult)
           throws JsonProcessingException {
     if (bindingResult.hasErrors()) {
-      StringBuilder missingFields = new StringBuilder();
-      for (FieldError error : bindingResult.getFieldErrors()) {
-        missingFields.append(error.getField()).append(", ");
-      }
-      throw new NullPointerException(missingFields.toString());
+      throw new NullPointerException(Validator.getMissingFields(bindingResult));
     } else {
       if (!receivedMessage.getClient().getId().equals(System.getenv("CHAT_APP_UNIQUE_ID"))) {
         messageRepo.save(receivedMessage.getMessage());

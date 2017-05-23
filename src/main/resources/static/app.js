@@ -12,10 +12,6 @@ socket.addEventListener('message', function(event) {
     }
 });
 
-function sendMessage() {
-stompClient.send('/app/message', {}, 'message');
-}
-
 function Refresh() {
     window.location.reload(true);
 }

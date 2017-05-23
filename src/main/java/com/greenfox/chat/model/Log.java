@@ -4,11 +4,11 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class Log {
-  String path;
-  String method;
-  String dateTime;
-  String logLevel;
-  String requestData;
+  private String path;
+  private String method;
+  private String dateTime;
+  private String logLevel;
+  private String requestData;
 
   public Log() {
   }
@@ -18,14 +18,6 @@ public class Log {
     this.method = method;
     this.logLevel = logLevel;
     this.requestData = requestData;
-    dateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss.SSS"));
-  }
-
-  public Log(String path, String method, String logLevel) {
-    this.path = path;
-    this.method = method;
-    this.logLevel = logLevel;
-    this.requestData = "";
     dateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss.SSS"));
   }
 

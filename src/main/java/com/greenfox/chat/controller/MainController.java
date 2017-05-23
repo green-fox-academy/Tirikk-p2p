@@ -84,7 +84,7 @@ public class MainController {
     Logger.log(request);
     Message messageToSave = new Message(userRepo.findOne(1).getName(), message, IdGenerator.generateId(messageRepo));
     messageRepo.save(messageToSave);
-//    MessageSender.sendMessage(messageToSave);
+    MessageSender.sendMessage(messageToSave);
     return "redirect:/";
   }
 }

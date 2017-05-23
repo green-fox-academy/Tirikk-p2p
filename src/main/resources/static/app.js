@@ -1,7 +1,7 @@
 var updateCount = 0;
 var socket = new SockJS('/test');
 var stompClient = Stomp.over(socket);
-
+// var audio = new Audio('notification.mp3');
 stompClient.connect({}, function (frame) {
     stompClient.subscribe('/topic/messages');
 });
@@ -11,14 +11,15 @@ socket.addEventListener('message', function(event) {
     if (message.indexOf('username') !== -1) {
         var substring = event.data.substring(event.data.indexOf('{'), event.data.lastIndexOf('}') + 1);
         reloadList(substring);
-        changeTitle()
+        notify()
     }
 });
 
-function changeTitle() {
+function notify() {
     if (document.hidden) {
     updateCount++;
     document.title = '(' + updateCount + ')P2P Chat';
+    // audio.play();
 }}
 
 window.onfocus = function () {

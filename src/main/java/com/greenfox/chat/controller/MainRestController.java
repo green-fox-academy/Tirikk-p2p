@@ -33,11 +33,10 @@ public class MainRestController {
     if (bindingResult.hasErrors()) {
       throw new NullPointerException(Validator.getMissingFields(bindingResult));
     } else {
-      if (!receivedMessage.getClient().getId().equals(System.getenv("CHAT_APP_UNIQUE_ID")) && !messageRepo.exists
-              (receivedMessage.getMessage().getId())) {
+      if (!receivedMessage.getClient().getId().equals(System.getenv("CHAT_APP_UNIQUE_ID"))) {
         messageRepo.save(receivedMessage.getMessage());
         sendMessageWS(receivedMessage.getMessage());
-//        MessageSender.sendReceivedMessage(receivedMessage);
+        MessageSender.sendReceivedMessage(receivedMessage);
       }
       return new OkResponse();
     }

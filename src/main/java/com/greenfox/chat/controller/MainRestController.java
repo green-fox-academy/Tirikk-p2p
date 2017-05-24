@@ -6,6 +6,7 @@ import com.greenfox.chat.model.Message;
 import com.greenfox.chat.model.OkResponse;
 import com.greenfox.chat.model.ReceivedMessage;
 import com.greenfox.chat.repository.MessageRepository;
+import com.greenfox.chat.service.Logger;
 import com.greenfox.chat.service.MessageSender;
 import com.greenfox.chat.service.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @RestController
@@ -28,8 +30,9 @@ public class MainRestController {
 
   @PostMapping("/api/message/receive")
   @CrossOrigin("*")
-  public OkResponse receive(@RequestBody() @Valid ReceivedMessage receivedMessage, BindingResult bindingResult)
-          throws JsonProcessingException {
+  public OkResponse receive(@RequestBody() @Valid ReceivedMessage receivedMessage, BindingResult bindingResult,
+                            HttpServletRequest request) throws JsonProcessingException {
+    Logger.log(request);
     if (bindingResult.hasErrors()) {
       throw new NullPointerException(Validator.getMissingFields(bindingResult));
     } else {

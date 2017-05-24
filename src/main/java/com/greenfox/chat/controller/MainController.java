@@ -34,6 +34,7 @@ public class MainController {
     } else {
       Iterable<Message> messages = messageRepo.findAllByOrderByTimestampAsc();
       model.addAttribute("messages", messages);
+      model.addAttribute("user", userRepo.findOne(1));
       model.addAttribute("userNotProvided", false);
       return "index";
     }
@@ -68,6 +69,7 @@ public class MainController {
           request) {
     Logger.log(request);
     if (name.equals("")) {
+      model.addAttribute("user", userRepo.findOne(1));
       model.addAttribute("userNotProvided", true);
       return "index";
     } else {
@@ -85,6 +87,12 @@ public class MainController {
     Message messageToSave = new Message(userRepo.findOne(1).getName(), message, IdGenerator.generateId(messageRepo));
     messageRepo.save(messageToSave);
     MessageSender.sendMessage(messageToSave);
+    return "redirect:/";
+  }
+
+  @GetMapping("/emptyMessageRepo")
+  public String deleteMessages() {
+    messageRepo.deleteAll();
     return "redirect:/";
   }
 }

@@ -2,6 +2,8 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <title>P2P Chat</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"/>
   <script src="/webjars/jquery/jquery.min.js"></script>
   <script src="/webjars/sockjs-client/sockjs.min.js"></script>
   <script src="/webjars/stomp-websocket/stomp.min.js"></script>
@@ -10,32 +12,57 @@
 </head>
 <body>
 <noscript><h2>No javascript support</h2></noscript>
-<p th:if="${userNotProvided} == true">The username field is empty</p>
-<h1>Peer to Peer Chat Program</h1>
-<form method="post" action="/update">
-  <span>Your username:</span>
-  <input type="text" name="user"/>
-  <input type="submit" value="update"/>
-</form>
-<div th:unless="${userNotProvided} == true">
-  <ul>
-    <li>
-      <p>App<br/>
-        Hi there! Submit your message using the send button!</p>
-    </li>
-  </ul>
-  <ul th:each="message : ${messages}">
-    <li>
-      <span th:text="${message.username}"/><br/>
-      <span th:text="${message.text}"/>
-    </li>
-  </ul>
-  <div id="refreshable"></div>
-  <form method="post" action="/addMessage">
-    <textarea name="message"/>
-    <input type="submit" value="Send"/>
-  </form>
-  <button onclick="Refresh();">Refresh</button>
+<div class="navbar navbar-default navbar-static-top">
+  <div class="navbar-header">
+    <a class="navbar-brand" href="#">Peer to Peer Chat Program</a>
+  </div>
+</div>
+<div class="container">
+  <p class="alert alert-danger" th:if="${userNotProvided} == true">The username field is empty</p>
+  <div class="row">
+    <div class="col-md-6">
+      <div class="panel panel-info">
+        <div class="panel-heading">
+          User
+        </div>
+        <div class="panel-body">
+          <form method="post" action="/update">
+            <span><strong>Your username:</strong></span>
+            <input class="form-control" type="text" name="user" th:placeholder="${user.name}"/><br/>
+            <input class="btn btn-primary" type="submit" value="update"/>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="panel panel-info">
+    <div class="panel-heading">
+      Chat
+    </div>
+    <div class="panel-body" th:unless="${userNotProvided} == true">
+      <div class="panel" id="scroll" style="max-height: 350px; overflow-y: scroll; background-color: #f4f7fa">
+        <ul>
+          <li>
+            <span>App</span><br/>
+            <span>Hi there! Submit your message using the send button!</span>
+          </li>
+        </ul>
+        <ul th:each="message : ${messages}">
+          <li>
+            <span th:text="${message.username}"/><br/>
+            <span th:text="${message.text}"/>
+          </li>
+        </ul>
+        <div id="refreshable"></div>
+      </div>
+      <p><strong>Message</strong></p>
+      <form method="post" action="/addMessage">
+        <textarea class="form-control" name="message" required="required"/><br/>
+        <input class="btn btn-primary" type="submit" value="Send"/>
+        <a class="btn btn-default" href="javascript:Refresh();">Refresh</a>
+      </form>
+    </div>
+  </div>
 </div>
 </body>
 </html>

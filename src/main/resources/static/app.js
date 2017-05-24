@@ -22,13 +22,13 @@ function notify() {
     if (document.hidden) {
     updateCount++;
     document.title = '(' + updateCount + ')P2P Chat';
-    changeFavicon('favicon-notification.ico');
+    changeFavicon('favicon-notification.ico?v=2');
     // audio.play();
 }}
 
 window.onfocus = function () {
     document.title = 'P2P Chat';
-    changeFavicon('favicon.ico');
+    changeFavicon('favicon.ico?v=2');
     updateCount = 0;
 };
 
